@@ -1,0 +1,60 @@
+import threading
+import time
+import pandas as pd
+from ibapi.client import EClient
+from ibapi.wrapper import EWrapper
+from ibapi.contract import Contract
+import threading
+import time
+
+class IBapi(EWrapper, EClient):
+    def __init__(self):
+        EClient.__init__(self, self)
+        #self.order_df = pd.DataFrame(columns=[ 'OrderId', 'Symbol', 'Status'])
+
+    def nextValidId(self, orderId):
+        super().nextValidId(orderId)
+        self.nextValidOrderId = orderId
+        print("NextValidId:", orderId)
+
+
+
+
+def run_loop():
+    app.run()
+
+def limitOrder(direction,quantity,lt_price):
+    order = Order()
+    order.action = direction
+    order.orderType = "LMT"
+    order.totalQuantity = quantity
+    order.lmtPrice = lt_price
+    return order
+
+contract = Contract()
+contract.symbol = 'DAX'
+contract.secType = 'FUT'
+contract.exchange = 'Eurex'
+contract.currency = 'EUR'
+contract.multiplier=1
+contract.lastTradeDateOrContractMonth = '202312'
+
+
+app = IBapi()
+app.connect('127.0.0.1', 7497, 23)
+
+# Start the socket in a thread
+api_thread = threading.Thread(target=run_loop, daemon=True)
+api_thread.start()
+
+i=5
+while i<10:
+    print(  app.reqIds(1))
+    time.sleep(2)
+    order_id = app.nextValidOrderId
+    # order_id=app.reqIds(1)
+   # app.placeOrder(order_id,contract,limitOrder("Buy",1,14000))
+   # app.order_df
+
+time.sleep(1)
+
